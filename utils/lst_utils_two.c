@@ -10,7 +10,7 @@ t_states    return_state(int flag)
 }
 int flag_state(char quote, int flag)
 {
-	if (quote == '\'' || quote == '\"' &&  flag)
+	if ((quote == '\'' || quote == '\"') &&  flag)
 		flag = 0;
 	else if (quote == '\'')
 	{
@@ -36,4 +36,19 @@ t_states check_state(char *str)
 		i++;
 	}
 	return (return_state(flag));
+}
+
+t_cmd	*lst_delete(t_cmd *cmd)
+{
+	t_cmd	*tmp;
+
+	tmp = cmd;
+	while (cmd)
+	{
+		free(cmd->command);
+		tmp = cmd->next;
+		free(cmd);
+		cmd = tmp;
+	}
+	return (cmd);
 }

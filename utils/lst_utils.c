@@ -17,53 +17,13 @@ t_types	check_type(char *str)
 			return (HERE_DOC);
 		else if (str[i] == '<' && str[i + 1] == '<')
 			return (REDIR_DOC);
-		else if (str[i] == ' ')
+		else if (str[i] == ' ' || str[i] == '\t' || str[i] == '\n')
 			return (W_SPACE);
 		else if (str[i] == '$')
 			return (ENV);
 		i++;
 	}
 	return (WORD);
-}
-
-t_states check_state(char *str)
-{
-	int			i;
-	static int	flag;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '\"')
-		{
-			if (flag)
-			{
-				flag = 0;
-				break ;
-			}
-			else
-				flag = 1;
-			return (IN_DQ);
-		}
-		else if (str[i] == '\'')
-		{
-			if (flag)
-			{
-				flag = 0;
-				break ;
-			}
-			else
-				flag = 2;
-			return (IN_Q);
-		}
-		i++;
-	}
-	if (flag == 1)
-		return (IN_DQ);
-	else if (flag == 2)
-		return (IN_Q);
-	else
-		return (GENERAL);
 }
 
 t_cmd	*lst_init(t_cmd *cmd, char *token)
