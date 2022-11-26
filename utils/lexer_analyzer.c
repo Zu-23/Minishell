@@ -1,27 +1,38 @@
 #include "../shell_header.h"
-
-void	quote_syntax_err(t_cmd *cmd)
+int	err(char *str)
 {
-	t_cmd	*last;
-
-	last = lst_last(cmd);
-	if (last->state != GENERAL)
-		perror("syntax error: open quotes");
+	printf("%s", str);
+	return (1);
 }
-void	unsupport_syntax_err(t_cmd *cmd)
+int	quote_syntax_err(t_cmd *cmd)
 {
-	t_cmd	*tmp;
+	static int	flag;
 
-	tmp = cmd;
-	while (tmp)
+	if (!ft_strcmp(cmd->command, "\'")
+		|| !ft_strcmp(cmd->command, "\""))
+		{
+			if (flag == 0)
+				flag = 1;
+			else if (flag)
+				flag = 0;
+		}
+	if (cmd->next == NULL && flag)
 	{
-		if (!ft_strcmp(tmp->command, ";")
-			|| !ft_strcmp(tmp->command, "\\")
-			|| !ft_strcmp(tmp->command, "&")
-			|| !ft_strcmp(tmp->command, "|"))
-			perror("%s is unsupported\n");
-		tmp = tmp->next;
+		flag = 0;
+		return(err("unclosed quotes\n"));
 	}
+	return (0);
+}
+int	unsupport_syntax_err(t_cmd *cmd)
+{
+	if (!ft_strcmp(cmd->command, ";")
+		|| !ft_strcmp(cmd->command, "\\")
+		|| !ft_strcmp(cmd->command, "&"))
+		{
+			printf("%s ",cmd->command);
+			return (err("Unsupported token\n"));
+		}
+	return (0);			
 }
 
 int	pipe_wspace(t_cmd *cmd)
@@ -35,64 +46,65 @@ int	pipe_wspace(t_cmd *cmd)
 	{
 		tmp = tmp->prev;
 		tmp2 = tmp2->next;
-		while (tmp->type == W_SPACE)
+		while (tmp && tmp->type == W_SPACE)
 			tmp = tmp->prev;
-		while (tmp2->next->type == W_SPACE)
+		while (tmp2 && tmp2->type == W_SPACE)
 			tmp2 = tmp2->next;
-		if (!tmp || !tmp2->command[0])
-			perror("parse error near |\n");
-		else if (tmp->type != WORD || tmp2->type != WORD)
-			perror("parse error near |\n");
+		if (!tmp || !tmp2)
+			return (1);
+		if (tmp->type != WORD || tmp2->type != WORD)
+			return (1);
 	}
+	else if (cmd->prev->type != WORD || cmd->next->type != WORD)
+		return (1);
 	return (0);
 }
-void	pipe_syntax_err(t_cmd *cmd)
+
+int	pipe_syntax_err(t_cmd *cmd)
+{
+		if (!ft_strcmp(cmd->command, "|"))
+		{
+			if (cmd->prev == NULL || cmd->next == NULL)
+				return (err("parse error near |\n"));
+			if (!ft_strcmp(cmd->next->command, "|"))
+				return (err("|| unsupported token\n"));
+			if (pipe_wspace(cmd))
+				return (err("parse error near |\n"));
+			else if (cmd->prev->type != WORD || cmd->next->type != WORD)
+			{
+				printf("parse error near |\n");
+				return (1);
+			}
+		}
+	return (0);
+}
+
+int	redirect_syntax_err(t_cmd *cmd)
+{
+	if (!ft_strcmp(cmd->command, ">") || !ft_strcmp(cmd->command, ">>")
+		|| !ft_strcmp(cmd->command, "<") || !ft_strcmp(cmd->command, "<<"))
+		{
+			if (cmd->next == NULL)
+				return (err("parse error\n"));
+			cmd = cmd->next;
+			while (cmd && cmd->type == W_SPACE)
+				cmd = cmd->next;
+			if (!cmd || cmd->type != WORD)
+				return (err("parse error\n"));
+		}
+	return (0);
+}
+void	lexer_analyzer(t_cmd *cmd)
 {
 	t_cmd	*tmp;
 
 	tmp = cmd;
 	while (tmp)
 	{
-		if (!ft_strcmp(tmp->command, "|"))
-		{
-			if (pipe_wspace(cmd));
-			else if (tmp->prev->type != WORD || tmp->next->type != WORD)
-				printf("parse error near |\n");
-		}
+		if (redirect_syntax_err(tmp) || unsupport_syntax_err(tmp)
+			|| pipe_syntax_err(tmp) || pipe_syntax_err(tmp)
+			|| quote_syntax_err(tmp))
+			return ;
 		tmp = tmp->next;
 	}
-}
-
-void	redirect_syntax_err(t_cmd *cmd)
-{
-	t_cmd *tmp;
-
-	tmp = cmd;
-	while (tmp)
-	{
-		if (!ft_strcmp(tmp->command, ">")
-		|| !ft_strcmp(tmp->command, ">>")
-		|| !ft_strcmp(tmp->command, "<<")
-		|| !ft_strcmp(tmp->command, "<"))
-		{
-			if (tmp->next->type == W_SPACE)
-			{
-				tmp = tmp->next;
-				while (tmp->type == W_SPACE)
-					tmp = tmp->next;
-				if (!tmp->command[0])
-					printf("parse error near \\n\n");
-				else if (tmp->type != WORD)
-					printf("parse error near \\n\n");
-			}
-		}
-		tmp = tmp->next;
-	}
-}
-void	lexer_analyzer(t_cmd *cmd)
-{
-	quote_syntax_err(cmd);
-	unsupport_syntax_err(cmd);
-	pipe_syntax_err(cmd);
-	redirect_syntax_err(cmd);
 }

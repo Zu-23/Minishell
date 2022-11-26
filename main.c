@@ -24,15 +24,24 @@ int main()
 			ft_perror("exit");
 		if (ft_strlen(input) > 0)
 			add_history(input);
-		token = ft_strtok(input, " \'\"-/$><&\\;");
+		token = ft_strtok(input, " \'\"-/$><&\\;|");
 		while (token)
 		{
 			//printf("%s\n",token);
 			cmd = lexer(token, cmd);
 			free(token);
-			token = ft_strtok(NULL, " \'\"-/$><");
+			token = ft_strtok(NULL, " \'\"-/$><&\\;|");
 		}
+		t_cmd *tmp;
+		tmp = cmd;
+		while (tmp)
+		{
+			printf("------start-------\n%s\ntype: %d\n-------end--------\n",tmp->command,tmp->type);
+			tmp = tmp->next;
+		}
+		printf("****status****\n");
 		lexer_analyzer(cmd);
+		printf("*****end of status*****\n");
 		cmd = lst_delete(cmd);
 	}
 }

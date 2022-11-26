@@ -33,7 +33,7 @@ char	*ft_strtok( char *str, char *delim)
 
 	if (!str)
 		str = loc;
-	if (!str)
+	if (!str || !str[0])
 		return (NULL);
 	i = 0;
 	while (str[i])
