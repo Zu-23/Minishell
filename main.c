@@ -1,5 +1,11 @@
 #include "shell_header.h"
 
+typedef struct environment
+{
+	char *var;
+	char *value;
+}env_struct;
+
 t_cmd	*lexer(char *token, t_cmd *cmd)
 {
 
@@ -10,13 +16,47 @@ t_cmd	*lexer(char *token, t_cmd *cmd)
 	return (cmd);
 }
 
-int main()
+env_struct *get_env(char **env)
+{
+	int i;
+	int	j;
+    char ***splitted_2d_env;
+    env_struct *env_var;
+
+	i = 0;
+    while (env[i])
+        i++;
+    env_var = malloc(sizeof(env_struct) * i);
+    splitted_2d_env = malloc(sizeof(char **) * (i + 1));
+    i = -1;
+    while (env[i])
+        splitted_2d_env[i] = ft_split(env[i], '=');
+    splitted_2d_env[i] = NULL;
+    while (splitted_2d_env[j])
+    {
+		i = 0;
+        while (splitted_2d_env[j][i])
+        {
+            env_var[j].var = ft_strdup(splitted_2d_env[j][i++]);
+            env_var[j].value = ft_strdup(splitted_2d_env[j][i++]);
+        }
+        j++;
+    }
+	return (env_var);
+}
+
+int main(int ac, char **av, char **env)
 {
 	char		*input;
 	char		*token;
 	t_cmd		*cmd;
+	// char		**env_stock;
 
 	cmd = NULL;
+	(void)ac;
+	(void)av;
+	(void)env;
+	// env_stock = get_env(env);
 	while (1)
 	{
 		input = readline("$>");
@@ -24,26 +64,25 @@ int main()
 			ft_perror("exit");
 		if (ft_strlen(input) > 0)
 			add_history(input);
-		token = ft_strtok(input, " \'\"-/$><&\\;|");
+		token = ft_strtok(input, " \'\"/$><&\\;|");
 		while (token)
 		{
-			//printf("%s\n",token);
 			cmd = lexer(token, cmd);
 			free(token);
-			token = ft_strtok(NULL, " \'\"-/$><&\\;|");
+			token = ft_strtok(NULL, " \'\"/$><&\\;|");
 		}
-		t_cmd *tmp;
-		tmp = cmd;
-		while (tmp)
-		{
-			printf("------start-------\n%s\ntype: %d\n-------end--------\n",tmp->command,tmp->type);
-			tmp = tmp->next;
-		}
-		printf("****status****\n");
-		lexer_analyzer(cmd);
-		printf("*****end of status*****\n");
-		cmd = lst_delete(cmd);
-	}
+		cmd = lexer_analyzer(cmd);
+		// cmd = asyntax(cmd);
+		// execute(cmd, env_stock);
+	// 	t_cmd *tmp;
+	// 	tmp = cmd;
+	// 	while (tmp)
+	// 	{
+	// 		printf("command %s\n",tmp->command);
+	// 		tmp = tmp->next;
+	// 	}
+	// 	cmd = lst_delete(cmd);
+	// }
 }
 
 ///checking for syntax errors:

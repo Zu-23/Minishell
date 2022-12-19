@@ -65,16 +65,11 @@ int	pipe_syntax_err(t_cmd *cmd)
 		if (!ft_strcmp(cmd->command, "|"))
 		{
 			if (cmd->prev == NULL || cmd->next == NULL)
-				return (err("parse error near |\n"));
-			if (!ft_strcmp(cmd->next->command, "|"))
+				return (err("parse error near | 1\n"));
+			else if (!ft_strcmp(cmd->next->command, "|"))
 				return (err("|| unsupported token\n"));
-			if (pipe_wspace(cmd))
-				return (err("parse error near |\n"));
-			else if (cmd->prev->type != WORD || cmd->next->type != WORD)
-			{
-				printf("parse error near |\n");
-				return (1);
-			}
+			else if (pipe_wspace(cmd))
+				return (err("parse error near | 2\n"));
 		}
 	return (0);
 }
@@ -94,7 +89,7 @@ int	redirect_syntax_err(t_cmd *cmd)
 		}
 	return (0);
 }
-void	lexer_analyzer(t_cmd *cmd)
+t_cmd	*lexer_analyzer(t_cmd *cmd)
 {
 	t_cmd	*tmp;
 
@@ -104,7 +99,8 @@ void	lexer_analyzer(t_cmd *cmd)
 		if (redirect_syntax_err(tmp) || unsupport_syntax_err(tmp)
 			|| pipe_syntax_err(tmp) || pipe_syntax_err(tmp)
 			|| quote_syntax_err(tmp))
-			return ;
+			return (NULL);
 		tmp = tmp->next;
 	}
+	return (expander(cmd));
 }
