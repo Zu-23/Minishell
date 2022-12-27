@@ -9,6 +9,7 @@ utils/ft_strcmp.c \
 utils/lexer_analyzer.c \
 utils/ft_perror.c \
 utils/ft_split.c \
+utils/ast.c \
 main.c \
 
 OBJ= $(SRC:.c=.o)

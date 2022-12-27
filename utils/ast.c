@@ -23,29 +23,8 @@
 
 // // arr[] aaa | bbb | ccc
 
-typedef struct cmarg
-{
-  char *command;
-  char **arg;
-} t_cmarg;
 
-typedef struct pipeline
-{
-	t_node	*right;
-	t_cmarg	*left;
-} t_pipe;
 
-typedef union ast_val  //union to ma
-{
-   t_cmarg cmarg;
-   t_pipe  pipe;
-}t_ast_val;
-
-typedef struct node
-{
-	t_types		node_type;
-	t_ast_val 	node_data;
-}t_node;
 
 t_cmd *expander(t_cmd *cmd)
 {
@@ -84,29 +63,63 @@ t_node *parse_pipe(t_cmd *cmd, t_node *tree)
 
 	pipe_node = malloc(sizeof(t_node));
 	pipe_node->node_type = PIPE;
-	pipe_node->node_data.pipe.left = &tree->node_data.cmarg;
+	pipe_node->node_data.pipe.left = tree;
 	pipe_node->node_data.pipe.right = asyntax(cmd);
 	return (pipe_node);
 }
-int parse_command(t_cmd *cmd, t_node **command_node)
-{
-  t_types 	type;
 
-  type = cmd->prev->type;
-  if (!cmd->prev || type != WORD)
-  {
-	*command_node = malloc(sizeof(t_node));
-	(*command_node)->node_type = COMMAND;
-	(*command_node)->node_data.cmarg.command = cmd->command;
-	return (1);
-  }
-  return (0);
+void	parse_args(t_cmd *cmd, t_node **tree)
+{
+	int		size;
+	t_cmd 	*tmp;
+
+	size = 0;
+	tmp = cmd;
+	while (tmp->next && tmp->next->type == WORD)
+	{
+		tmp = tmp->next;
+		size++;
+	}
+	(*tree)->node_data.cmarg.arg = malloc(sizeof(char **) * (size + 1));
+	if (!(*tree)->node_data.cmarg.arg)
+		return ;
+	tmp = cmd;
+	size = 0;
+	while (tmp->next && tmp->next->type == WORD)
+	{
+		tmp = tmp->next;
+		(*tree)->node_data.cmarg.arg[size++] = tmp->command;
+	}
+	(*tree)->node_data.cmarg.arg[size] = NULL;
 }
+void parse_command(t_cmd *cmd, t_node **tree)//function that creates t_node node for command
+{
+	if (!cmd->prev || cmd->prev->type != WORD)
+	{
+		*tree = malloc(sizeof(t_node));
+		if (!*tree)
+			return ;
+		(*tree)->node_type = COMMAND;
+		(*tree)->node_data.cmarg.command = cmd->command;
+		parse_args(cmd, tree);
+	}
+}
+// void	visit(t_node *tree)
+// {
+// 	if (tree->node_type != PIPE)
+// 		printf("command: %s\n",tree->node_data.cmarg.command);
+// 	else if (tree->node_type == PIPE)
+// 	{
+// 		printf("pipe |\n");
+// 		visit(tree->node_data.pipe.left);
+// 		visit(tree->node_data.pipe.right);
+// 	}
+// }
+
 t_node *asyntax(t_cmd *cmd)
 {
-	t_cmd *tmp;
-	t_cmd *command;
-	t_node *tree;
+	t_cmd	*tmp;
+	t_node	*tree;
 
 	tmp = cmd;
 	while (tmp)
@@ -116,7 +129,12 @@ t_node *asyntax(t_cmd *cmd)
 		{
 			tmp = tmp->next;
 			tree = parse_pipe(tmp, tree);
+			break ;
 		}
+		else if (tmp->type == HERE_DOC)
+		else if (tmp->type == REDIR_DOC)
+		else if (tmp->type == REDIR_IN)
+		else if (tmp->type == REDIR_OUT)
 		tmp = tmp->next;
 	}
 	return (tree);

@@ -5,7 +5,6 @@
 # include <stdlib.h>
 # include <readline/readline.h>
 # include <readline/history.h> 
-
 typedef enum types
 {
 	WORD = 1,
@@ -26,6 +25,34 @@ typedef enum states
 	IN_Q = '\'',
 	GENERAL = 3,
 }t_states;
+
+// this is modifiable
+typedef struct node t_node;
+typedef struct cmarg
+{
+  char *command;
+  char **arg;
+} t_cmarg;
+
+typedef struct pipeline
+{
+	t_node	*right;
+	t_node	*left;
+} t_pipe;
+
+typedef union ast_val  //union to ma
+{
+   t_cmarg	cmarg;
+   t_pipe	pipe;
+}t_ast_val;
+
+struct node
+{
+	t_types		node_type;
+	t_ast_val 	node_data;
+};
+
+//modifiable
 
 typedef struct cmd
 {
@@ -50,6 +77,7 @@ t_cmd	*lst_delete(t_cmd *cmd);
 t_cmd	*lexer(char *token, t_cmd *cmd);
 t_cmd	*lexer_analyzer(t_cmd *cmd);
 t_cmd 	*expander(t_cmd *cmd);
+t_node 	*asyntax(t_cmd *cmd);
 char	**ft_split(char const *s, char c);
 t_states check_state(char *str);
 

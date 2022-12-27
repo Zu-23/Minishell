@@ -45,11 +45,29 @@ env_struct *get_env(char **env)
 	return (env_var);
 }
 
+void	visit(t_node *tree)//function to print the tree recursively
+{
+	int	i = 0;
+	if (tree->node_type != PIPE)
+	{
+		printf("command: %s : ",tree->node_data.cmarg.command);
+		while(tree->node_data.cmarg.arg[i])
+			printf("arg: %s\n",tree->node_data.cmarg.arg[i++]);
+	}
+	else if (tree->node_type == PIPE)
+	{
+		printf("pipe |\n");
+		visit(tree->node_data.pipe.left);
+		visit(tree->node_data.pipe.right);
+	}
+}
+
 int main(int ac, char **av, char **env)
 {
 	char		*input;
 	char		*token;
 	t_cmd		*cmd;
+	t_node		*tree;
 	// char		**env_stock;
 
 	cmd = NULL;
@@ -72,7 +90,10 @@ int main(int ac, char **av, char **env)
 			token = ft_strtok(NULL, " \'\"/$><&\\;|");
 		}
 		cmd = lexer_analyzer(cmd);
-		// cmd = asyntax(cmd);
+		tree = asyntax(cmd);
+		visit(tree);
+		cmd = lst_delete(cmd);
+	}
 		// execute(cmd, env_stock);
 	// 	t_cmd *tmp;
 	// 	tmp = cmd;
@@ -81,7 +102,6 @@ int main(int ac, char **av, char **env)
 	// 		printf("command %s\n",tmp->command);
 	// 		tmp = tmp->next;
 	// 	}
-	// 	cmd = lst_delete(cmd);
 	// }
 }
 
