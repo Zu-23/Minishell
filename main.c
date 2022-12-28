@@ -24,6 +24,7 @@ env_struct *get_env(char **env)
     env_struct *env_var;
 
 	i = 0;
+	j = 0;
     while (env[i])
         i++;
     env_var = malloc(sizeof(env_struct) * i);
@@ -82,12 +83,12 @@ int main(int ac, char **av, char **env)
 			ft_perror("exit");
 		if (ft_strlen(input) > 0)
 			add_history(input);
-		token = ft_strtok(input, " \'\"/$><&\\;|");
+		token = ft_strtok(input, " \'\"/$><&\\;|()");
 		while (token)
 		{
 			cmd = lexer(token, cmd);
 			free(token);
-			token = ft_strtok(NULL, " \'\"/$><&\\;|");
+			token = ft_strtok(NULL, " \'\"/$><&\\;|()");
 		}
 		cmd = lexer_analyzer(cmd);
 		tree = asyntax(cmd);

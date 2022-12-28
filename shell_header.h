@@ -7,16 +7,16 @@
 # include <readline/history.h> 
 typedef enum types
 {
-	WORD = 1,
+	WORD = -1,
 	NULL_TERM = '\0',
 	PIPE = '|',
-	REDIR_IN = '<',
-	REDIR_OUT = '>',
 	W_SPACE = ' ',
 	ENV = '$',
-	HERE_DOC,
-	REDIR_DOC,
-	COMMAND,
+	REDIR_OUT = 1,
+	REDIR_IN = 2,
+	HERE_DOC = 3,
+	REDIR_DOC = 4,
+	COMMAND = 5,
 }t_types;
 
 typedef enum states
@@ -26,7 +26,7 @@ typedef enum states
 	GENERAL = 3,
 }t_states;
 
-// this is modifiable
+// test area
 typedef struct node t_node;
 typedef struct cmarg
 {
@@ -34,13 +34,13 @@ typedef struct cmarg
   char **arg;
 } t_cmarg;
 
-typedef struct pipeline
+typedef struct pipe_redir
 {
 	t_node	*right;
 	t_node	*left;
-} t_pipe;
+} t_pip_red;
 
-typedef union ast_val  //union to ma
+typedef union ast_val
 {
    t_cmarg	cmarg;
    t_pipe	pipe;
@@ -52,7 +52,7 @@ struct node
 	t_ast_val 	node_data;
 };
 
-//modifiable
+//end of test area
 
 typedef struct cmd
 {

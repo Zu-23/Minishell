@@ -26,6 +26,7 @@
 
 
 
+
 t_cmd *expander(t_cmd *cmd)
 {
   t_cmd *tmp;
@@ -33,7 +34,7 @@ t_cmd *expander(t_cmd *cmd)
   tmp = cmd;
   while (tmp)
   {
-	if (!strcmp(tmp->command, " ") || !strcmp(tmp->command, "\"") || !strcmp(tmp->command, "\'"))
+	if (!ft_strcmp(tmp->command, " ") || !ft_strcmp(tmp->command, "\"") || !ft_strcmp(tmp->command, "\'"))
 	{
 	  if (!tmp->prev && tmp->next)
 	  {
@@ -92,9 +93,10 @@ void	parse_args(t_cmd *cmd, t_node **tree)
 	}
 	(*tree)->node_data.cmarg.arg[size] = NULL;
 }
+
 void parse_command(t_cmd *cmd, t_node **tree)//function that creates t_node node for command
 {
-	if (!cmd->prev || cmd->prev->type != WORD)
+	if ((!cmd->prev || cmd->prev->type != WORD) && (cmd->type == WORD))
 	{
 		*tree = malloc(sizeof(t_node));
 		if (!*tree)
@@ -103,6 +105,8 @@ void parse_command(t_cmd *cmd, t_node **tree)//function that creates t_node node
 		(*tree)->node_data.cmarg.command = cmd->command;
 		parse_args(cmd, tree);
 	}
+	else if (!cmd->perv)
+		*tree = NULL;
 }
 // void	visit(t_node *tree)
 // {
@@ -115,6 +119,14 @@ void parse_command(t_cmd *cmd, t_node **tree)//function that creates t_node node
 // 		visit(tree->node_data.pipe.right);
 // 	}
 // }
+t_node *parse_redir(t_cmd *cmd, t_node *tree)
+{
+	t_node *redir_node;
+
+	redir_node = malloc(sizeof(t_node));
+	redir_node->left = tree;
+	redir_node->right = asyntax(cmd);
+}
 
 t_node *asyntax(t_cmd *cmd)
 {
@@ -131,10 +143,12 @@ t_node *asyntax(t_cmd *cmd)
 			tree = parse_pipe(tmp, tree);
 			break ;
 		}
-		else if (tmp->type == HERE_DOC)
-		else if (tmp->type == REDIR_DOC)
-		else if (tmp->type == REDIR_IN)
-		else if (tmp->type == REDIR_OUT)
+		else if (tmp->type >= REDIR_OUT && tmp->type <= REDIR_DOC)
+		{
+			tmp = tmp->next;
+			tree = parse_redir(tmp, tree);
+			break ;
+		}
 		tmp = tmp->next;
 	}
 	return (tree);
