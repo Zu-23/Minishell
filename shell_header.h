@@ -16,7 +16,8 @@ typedef enum types
 	REDIR_IN = 2,
 	HERE_DOC = 3,
 	REDIR_DOC = 4,
-	COMMAND = 5,
+	REDIR = 5;
+	COMMAND = 6,
 }t_types;
 
 typedef enum states

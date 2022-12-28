@@ -60,13 +60,16 @@ t_cmd *expander(t_cmd *cmd)
 
 t_node *parse_pipe(t_cmd *cmd, t_node *tree)
 {
-	t_node	*pipe_node;
+	t_node	*pip_red;
 
-	pipe_node = malloc(sizeof(t_node));
-	pipe_node->node_type = PIPE;
-	pipe_node->node_data.pipe.left = tree;
-	pipe_node->node_data.pipe.right = asyntax(cmd);
-	return (pipe_node);
+	pip_red = malloc(sizeof(t_node));
+	if (tmp->prev->type == PIPE)
+		pip_red->node_type = PIPE;
+	else if (tmp->prev->type >= REDIR_IN && tmp->prev->type <= REDIR_DOC)
+		pip_red->node_type = REDIR;
+	pip_red->node_data.pipe.left = tree;
+	pip_red->node_data.pipe.right = asyntax(cmd);
+	return (pip_red);
 }
 
 void	parse_args(t_cmd *cmd, t_node **tree)
@@ -119,14 +122,6 @@ void parse_command(t_cmd *cmd, t_node **tree)//function that creates t_node node
 // 		visit(tree->node_data.pipe.right);
 // 	}
 // }
-t_node *parse_redir(t_cmd *cmd, t_node *tree)
-{
-	t_node *redir_node;
-
-	redir_node = malloc(sizeof(t_node));
-	redir_node->left = tree;
-	redir_node->right = asyntax(cmd);
-}
 
 t_node *asyntax(t_cmd *cmd)
 {
@@ -137,16 +132,10 @@ t_node *asyntax(t_cmd *cmd)
 	while (tmp)
 	{
 		parse_command(tmp, &tree);
-		if (tmp->type == PIPE)
+		if (tmp->type == PIPE || (tmp->type >= REDIR_OUT && tmp->type <= REDIR_DOC))
 		{
 			tmp = tmp->next;
 			tree = parse_pipe(tmp, tree);
-			break ;
-		}
-		else if (tmp->type >= REDIR_OUT && tmp->type <= REDIR_DOC)
-		{
-			tmp = tmp->next;
-			tree = parse_redir(tmp, tree);
 			break ;
 		}
 		tmp = tmp->next;
