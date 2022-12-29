@@ -63,9 +63,9 @@ t_node *parse_pipe(t_cmd *cmd, t_node *tree)
 	t_node	*pip_red;
 
 	pip_red = malloc(sizeof(t_node));
-	if (tmp->prev->type == PIPE)
+	if (cmd->prev->type == PIPE)
 		pip_red->node_type = PIPE;
-	else if (tmp->prev->type >= REDIR_IN && tmp->prev->type <= REDIR_DOC)
+	else if (cmd->prev->type >= REDIR_IN && cmd->prev->type <= REDIR_DOC)
 		pip_red->node_type = REDIR;
 	pip_red->node_data.pipe.left = tree;
 	pip_red->node_data.pipe.right = asyntax(cmd);
