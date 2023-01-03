@@ -92,7 +92,6 @@ int main(int ac, char **av, char **env)
 		}
 		cmd = lexer_analyzer(cmd);
 		tree = asyntax(cmd);
-		visit(tree);
 		cmd = lst_delete(cmd);
 	}
 		// execute(cmd, env_stock);

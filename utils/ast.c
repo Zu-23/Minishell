@@ -29,33 +29,39 @@
 
 t_cmd *expander(t_cmd *cmd)
 {
-  t_cmd *tmp;
+	t_cmd *tmp;
 
-  tmp = cmd;
-  while (tmp)
-  {
-	if (!ft_strcmp(tmp->command, " ") || !ft_strcmp(tmp->command, "\"") || !ft_strcmp(tmp->command, "\'"))
+	tmp = cmd;
+	while (tmp)
 	{
-	  if (!tmp->prev && tmp->next)
-	  {
-		cmd = tmp->next;
-		tmp->next->prev = NULL;
-	  }
-	  else if (!tmp->next && tmp->prev)
-		tmp->prev->next = NULL;
-	  else if (tmp->prev && tmp->next)
-	  {
-		tmp->prev->next = tmp->next;
-		tmp->next->prev = tmp->prev;
-	  }
-	  free(tmp->command);
-	  free(tmp);
-	  tmp = cmd;
+		if ((!ft_strcmp(tmp->command, " ") && tmp->state == GENERAL) || !ft_strcmp(tmp->command, "\"") || !ft_strcmp(tmp->command, "\'"))
+		{
+			if (!tmp->prev && tmp->next)
+			{
+				cmd = tmp->next;
+				tmp->next->prev = NULL;
+			}
+			else if (!tmp->next && tmp->prev)
+				tmp->prev->next = NULL;
+			else if (tmp->prev && tmp->next)
+			{
+				tmp->prev->next = tmp->next;
+				tmp->next->prev = tmp->prev;
+			}
+			free(tmp->command);
+			free(tmp);
+			tmp = cmd;
+		}
+		else
+			tmp = tmp->next;
 	}
-	else
-	  tmp = tmp->next;
-  }
-  return (cmd);
+	tmp = cmd;
+	while (tmp)
+	{
+		printf("command: %s\n", tmp->command);
+		tmp = tmp->next;
+	}
+	return (cmd);
 }
 
 t_node *parse_pipe(t_cmd *cmd, t_node *tree)
@@ -108,7 +114,7 @@ void parse_command(t_cmd *cmd, t_node **tree)//function that creates t_node node
 		(*tree)->node_data.cmarg.command = cmd->command;
 		parse_args(cmd, tree);
 	}
-	else if (!cmd->perv)
+	else if (!cmd->prev)
 		*tree = NULL;
 }
 // void	visit(t_node *tree)

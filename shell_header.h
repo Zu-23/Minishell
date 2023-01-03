@@ -16,7 +16,7 @@ typedef enum types
 	REDIR_IN = 2,
 	HERE_DOC = 3,
 	REDIR_DOC = 4,
-	REDIR = 5;
+	REDIR = 5,
 	COMMAND = 6,
 }t_types;
 
@@ -33,18 +33,18 @@ typedef struct cmarg
 {
   char *command;
   char **arg;
-} t_cmarg;
+}t_cmarg;
 
 typedef struct pipe_redir
 {
 	t_node	*right;
 	t_node	*left;
-} t_pip_red;
+}t_pip_red;
 
 typedef union ast_val
 {
-   t_cmarg	cmarg;
-   t_pipe	pipe;
+   t_cmarg		cmarg;
+   t_pip_red	pipe;
 }t_ast_val;
 
 struct node
