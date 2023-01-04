@@ -96,9 +96,13 @@ t_cmd	*lexer_analyzer(t_cmd *cmd)
 	tmp = cmd;
 	while (tmp)
 	{
-		if (redirect_syntax_err(tmp) || unsupport_syntax_err(tmp)
-			|| pipe_syntax_err(tmp) || pipe_syntax_err(tmp)
-			|| quote_syntax_err(tmp))
+		if (tmp->state == GENERAL)
+		{
+			if (redirect_syntax_err(tmp) || unsupport_syntax_err(tmp)
+				|| pipe_syntax_err(tmp) || pipe_syntax_err(tmp))
+				return (NULL);
+		}
+		if (quote_syntax_err(tmp))
 			return (NULL);
 		tmp = tmp->next;
 	}

@@ -68,7 +68,7 @@ int main(int ac, char **av, char **env)
 	char		*input;
 	char		*token;
 	t_cmd		*cmd;
-	t_node		*tree;
+	//t_node		*tree;
 	// char		**env_stock;
 
 	cmd = NULL;
@@ -91,7 +91,7 @@ int main(int ac, char **av, char **env)
 			token = ft_strtok(NULL, " \'\"/$><&\\;|()");
 		}
 		cmd = lexer_analyzer(cmd);
-		tree = asyntax(cmd);
+		//tree = asyntax(cmd);
 		cmd = lst_delete(cmd);
 	}
 		// execute(cmd, env_stock);
