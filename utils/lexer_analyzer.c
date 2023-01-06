@@ -4,19 +4,27 @@ int	err(char *str)
 	printf("%s", str);
 	return (1);
 }
+
+int	flag_val(int val, int flag, t_cmd *cmd)
+{
+	if (flag == 0)
+		flag = val;
+	else if (flag != val && cmd->next == NULL)
+		return (-1);
+	else if (flag == val)
+		flag = 0;
+	return (flag);
+}
 int	quote_syntax_err(t_cmd *cmd)
 {
 	static int	flag;
 
-	if (!ft_strcmp(cmd->command, "\'")
-		|| !ft_strcmp(cmd->command, "\""))
-		{
-			if (flag == 0)
-				flag = 1;
-			else if (flag)
-				flag = 0;
-		}
-	if (cmd->next == NULL && flag)
+	if (!ft_strcmp(cmd->command, "\'"))
+		flag = flag_val(1, flag, cmd);
+	else if (!ft_strcmp(cmd->command, "\""))
+		flag = flag_val(2, flag, cmd);
+
+	if (flag == -1 || (cmd->next == NULL && flag))
 	{
 		flag = 0;
 		return(err("unclosed quotes\n"));
